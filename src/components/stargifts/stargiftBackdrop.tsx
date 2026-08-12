@@ -74,13 +74,19 @@ export function StarGiftBackdrop(props: {
       color: rgbIntToHex(props.backdrop.pattern_color)
     }).then((canvas) => {
       if(!middleware()) return;
-      if(currentEmoji !== props.patternEmoji) return
+      if(currentEmoji !== props.patternEmoji) return;
+      if(!canvas) return;
       canvas.classList.add(styles.canvas, props.canvasClass);
       setPatternCanvas(canvas);
     });
   }
 
-  createEffect(on(() => [props.patternEmoji, props.backdrop], () => {
+  createEffect(on(() => [
+    props.patternEmoji?.id, 
+    props.backdrop?.pattern_color,
+    props.backdrop?.center_color,
+    props.backdrop?.edge_color
+  ], () => {
     render();
   }));
 

@@ -14,7 +14,7 @@ export default class BluffSpoilerController {
   private static connection: SpoilerRendererConnection;
   private static encoding = false;
   private static lastDrawTime: number = 0;
-  private static DRAW_INTERVAL = 4 * (1000 / 60); // Once in 4 frames (considering 60fps) to avoid performance issues
+  private static DRAW_INTERVAL = 100000; // Generate static mask to avoid WebP spam and freezes
 
   private static workerSimSupported: boolean;
   private static workerSimInited = false;

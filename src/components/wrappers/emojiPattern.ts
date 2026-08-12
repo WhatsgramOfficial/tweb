@@ -49,7 +49,8 @@ export default async function wrapEmojiPattern({
     width: emojiSize,
     height: emojiSize,
     // onlyThumb: true,
-    static: true,
+    static: false,
+    noOffscreen: true,
     withThumb: false,
     exportLoad: 2,
     useCache: false
@@ -57,13 +58,45 @@ export default async function wrapEmojiPattern({
     onCacheStatus?.(downloaded);
     return load();
   }).then((result) => {
-    const image = (result as HTMLImageElement[])[0];
-    if(!image.naturalWidth) {
-      console.warn('should wait for image size', image);
-      return pause(100).then(() => image);
+    let image: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement;
+    let isLottie = false;
+
+    if (result && !Array.isArray(result) && (result as any).canvas) {
+      isLottie = true;
+      image = (result as any).canvas[0];
+    } else {
+      image = (result as any)[0];
     }
-    return image;
-  }).then((image) => {
+
+    if(!image) return Promise.reject('No image returned');
+
+    if (isLottie) {
+      return new Promise<HTMLImageElement | HTMLCanvasElement | HTMLVideoElement>((resolve) => {
+        (result as any).addEventListener('firstFrame', () => {
+          resolve(image);
+          setTimeout(() => (result as any).destroy(), 10);
+        });
+      });
+    } else if (image instanceof HTMLVideoElement) {
+      if(image.readyState >= 2) {
+        image.pause();
+        return image;
+      }
+      return new Promise<HTMLImageElement | HTMLCanvasElement | HTMLVideoElement>((resolve) => {
+        image.addEventListener('loadeddata', () => {
+          image.pause();
+          resolve(image);
+        });
+      });
+    } else {
+      const img = image as HTMLImageElement;
+      if(img.naturalWidth) return img;
+      return img.decode().then(() => {
+        if(!img.naturalWidth) return Promise.reject('Image broken');
+        return img;
+      }).catch(() => Promise.reject('Image broken'));
+    }
+  }).then((image: HTMLImageElement | HTMLCanvasElement | HTMLVideoElement) => {
     const canvas = document.createElement('canvas');
     canvas.classList.add('emoji-pattern-canvas');
     canvas.style.width = `${canvasWidth}px`;

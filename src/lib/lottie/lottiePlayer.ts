@@ -722,7 +722,7 @@ export default class LottiePlayer extends EventListenerBase<LottiePlayerEvents> 
     this.pause();
 
     const curFrame = this.resetCurrentFrame();
-    if(renderFirstFrame) {
+    if(renderFirstFrame && this.frameCount !== undefined) {
       this.requestFrame(curFrame);
       // this.sendQuery('renderFrame', this.curFrame);
     }

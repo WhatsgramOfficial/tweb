@@ -44,7 +44,7 @@ import createMiddleware from '@helpers/solid/createMiddleware';
 import StickerType from '@config/stickerType';
 import readValue from '@helpers/solid/readValue';
 
-// https://github.com/telegramdesktop/tdesktop/blob/master/Telegram/SourceFiles/history/view/media/history_view_sticker.cpp#L40
+// https://github.com/telegramdesktop/tdesktop/blob/master/Whatsgram/SourceFiles/history/view/media/history_view_sticker.cpp#L40
 export const STICKER_EFFECT_MULTIPLIER = 1 + 0.245 * 2;
 const EMOJI_EFFECT_MULTIPLIER = 3;
 const UNMOUNT_THUMBS = true;
@@ -370,7 +370,13 @@ export default async function wrapSticker({doc, div, middleware, loadStickerMidd
         };
 
         getCacheContext();
+        const isFullNonImage = (!cacheContext || !cacheContext.type || cacheContext.type === 'f' || cacheContext.type === 'v');
         (div as HTMLElement[]).forEach((div, idx) => {
+          if(isFullNonImage) {
+            loadThumbPromise.resolve();
+            return;
+          }
+
           if(cacheContext.url) {
             r(new Image(), cacheContext.url, idx);
           } else if('bytes' in thumb) {
@@ -697,11 +703,15 @@ export default async function wrapSticker({doc, div, middleware, loadStickerMidd
         };
 
         getCacheContext();
-        if(cacheContext.url) r();
+        if(cacheContext.url && (cacheContext.type && cacheContext.type !== 'f' || stickerType === StickerType.Static)) r();
         else {
           let promise: Promise<any>;
           if(stickerType !== StickerType.Static && asStatic) {
             const thumb = choosePhotoSize(doc, width, height, false) as PhotoSize.photoSize;
+            if(!thumb || (thumb as any)._ === 'photoSizeEmpty' || thumb.type === 'v' || thumb.type === 'f') {
+              reject('No static thumbnail available for animated sticker');
+              return;
+            }
             // promise = managers.appDocsManager.getThumbURL(doc, thumb).promise
             promise = appDownloadManager.downloadMediaURL({media: doc, thumb, queueId: lazyLoadQueue?.queueId});
           } else {

@@ -268,7 +268,7 @@ export class AppDocsManager extends AppManager {
       doc.type = 'pdf';
     } else if(doc.mime_type === EXTENSION_MIME_TYPE_MAP.gif) {
       doc.type = 'gif';
-    } else if(doc.mime_type === EXTENSION_MIME_TYPE_MAP.tgs && doc.file_name === 'AnimatedSticker.tgs') {
+    } else if(doc.mime_type === EXTENSION_MIME_TYPE_MAP.tgs) {
       doc.type = 'sticker';
       doc.animated = true;
       doc.sticker = StickerType.Lottie;

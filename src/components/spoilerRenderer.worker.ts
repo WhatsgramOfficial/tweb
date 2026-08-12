@@ -55,7 +55,7 @@ export type SpoilerRendererOutMessage =
 const ctx = self as any;
 
 const FRAME_INTERVAL = 1000 / 60;
-const ENCODE_INTERVAL = 4 * (1000 / 60); // Once in 4 frames (considering 60fps) to avoid performance issues
+const ENCODE_INTERVAL = 100000; // Generate static mask to avoid WebP spam and freezes
 
 let reader: FileReaderSync;
 

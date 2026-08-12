@@ -1,15 +1,15 @@
 /// <reference types="vitest/config" />
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 import solidPlugin from 'vite-plugin-solid';
 // @ts-ignore no type declarations
 import handlebars from 'vite-plugin-handlebars';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 // import devtools from 'solid-devtools/vite'
 import autoprefixer from 'autoprefixer';
-import {resolve} from 'path';
-import {existsSync, copyFileSync, readFileSync} from 'fs';
-import {ServerOptions} from 'vite';
-import {watchLangFile} from './watch-lang.js';
+import { resolve } from 'path';
+import { existsSync, copyFileSync, readFileSync } from 'fs';
+import { ServerOptions } from 'vite';
+import { watchLangFile } from './watch-lang.js';
 import devChecks from './scripts/dev-checks.mjs';
 import path from 'path';
 
@@ -19,12 +19,12 @@ const ENV_LOCAL_FILE_PATH = path.join(rootDir, '.env.local');
 const LANG_PACK_LOCAL_FILE_PATH = path.join(rootDir, 'src', 'langPackLocalVersion.ts');
 
 const isDEV = process.env.NODE_ENV === 'development';
-if(!existsSync(LANG_PACK_LOCAL_FILE_PATH)) {
+if (!existsSync(LANG_PACK_LOCAL_FILE_PATH)) {
   copyFileSync(path.join(rootDir, 'src', 'langPackLocalVersion.example.ts'), LANG_PACK_LOCAL_FILE_PATH);
 }
 
-if(isDEV) {
-  if(!existsSync(ENV_LOCAL_FILE_PATH)) {
+if (isDEV) {
+  if (!existsSync(ENV_LOCAL_FILE_PATH)) {
     copyFileSync(path.join(rootDir, '.env.local.example'), ENV_LOCAL_FILE_PATH);
   }
 
@@ -33,10 +33,10 @@ if(isDEV) {
 
 const handlebarsPlugin = handlebars({
   context: {
-    title: 'Telegram Web',
-    description: 'Telegram is a cloud-based mobile and desktop messaging app with a focus on security and speed.',
-    url: 'https://web.telegram.org/k/',
-    origin: 'https://web.telegram.org/'
+    title: 'Whatsgram Web',
+    description: 'Whatsgram is a cloud-based mobile and desktop messaging app with a focus on security and speed.',
+    url: 'https://web.whatsgram.org/k/',
+    origin: 'https://web.whatsgram.org/'
   }
 });
 
@@ -45,11 +45,11 @@ const USE_SIGNED_CERTS = USE_SSL && true;
 const USE_SELF_SIGNED_CERTS = USE_SSL && false;
 
 // * mkdir certs; cd certs
-// * mkcert web.telegram.org
-// * chmod 644 web.telegram.org-key.pem
+// * mkcert web.whatsgram.org
+// * chmod 644 web.whatsgram.org-key.pem
 // * nano /etc/hosts
-// * 127.0.0.1 web.telegram.org
-const host = USE_SSL ? 'web.telegram.org' : 'localhost';
+// * 127.0.0.1 web.whatsgram.org
+const host = USE_SSL ? 'web.whatsgram.org' : 'localhost';
 
 // HTTP/2 for `pnpm start`. Vite serves dev modules unbundled — one request per module —
 // and over http/1.1 the browser's ~6-connections-per-origin cap serialises the hundreds
@@ -119,7 +119,7 @@ const ADDITIONAL_ALIASES = {
   '@': resolve(rootDir, 'src')
 };
 
-if(USE_OWN_SOLID) {
+if (USE_OWN_SOLID) {
   console.log('using own solid', SOLID_PATH, 'built', !USE_SOLID_SRC);
 } else {
   console.log('using original solid');
@@ -138,7 +138,7 @@ export default defineConfig({
     // Only emit the bundle treemap (stats.html) when explicitly analyzing (ANALYZE=1):
     // it adds build time and writes a ~1.3MB file that otherwise gets globbed into the
     // dep scan. Run `ANALYZE=1 pnpm build` to generate it.
-    process.env.ANALYZE ? import('rollup-plugin-visualizer').then(({visualizer}) => visualizer({
+    process.env.ANALYZE ? import('rollup-plugin-visualizer').then(({ visualizer }) => visualizer({
       gzipSize: true,
       template: 'treemap'
     })) : undefined

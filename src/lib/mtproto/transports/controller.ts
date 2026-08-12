@@ -44,8 +44,12 @@ export class MTTransportController extends EventListenerBase<{
     };
 
     const httpPromise = deferredPromise<boolean>();
-    ((this.transports.https as HTTP)._send(new Uint8Array(), 'no-cors') as any as Promise<any>)
-    .then(() => httpPromise.resolve(true), () => httpPromise.resolve(false));
+    if (this.transports.https && (this.transports.https as HTTP)._send) {
+      ((this.transports.https as HTTP)._send(new Uint8Array(), 'no-cors') as any as Promise<any>)
+      .then(() => httpPromise.resolve(true), () => httpPromise.resolve(false));
+    } else {
+      httpPromise.resolve(false);
+    }
     setTimeout(() => httpPromise.resolve(false), timeout);
 
     const websocketPromise = deferredPromise<boolean>();
