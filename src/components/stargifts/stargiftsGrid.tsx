@@ -47,8 +47,10 @@ function StarGiftGridItem(props: {
   let stickerRef!: HTMLDivElement;
 
   onMount(() => {
-    props.renderer.renderSticker(props.item.sticker, stickerRef);
-    props.renderer.observeAnimated(stickerRef);
+    if(props.item.sticker) {
+      props.renderer.renderSticker(props.item.sticker, stickerRef);
+      props.renderer.observeAnimated(stickerRef);
+    }
 
     if(props.view === 'profile' && !props.hasSelection) {
       const {raw, saved, input, isIncoming, isWearing} = props.item;
@@ -211,7 +213,7 @@ function StarGiftGridItem(props: {
         <div class={/* @once */ styles.itemPremiumBackground} />
       )}
 
-      {props.item.collectibleAttributes && (
+      {props.item.collectibleAttributes?.backdrop && props.item.collectibleAttributes?.pattern && (
         <StarGiftBackdrop
           class={/* @once */ styles.itemBackdrop}
           small
@@ -299,7 +301,7 @@ function StarGiftGridItem(props: {
           return (
             <StarGiftBadge
               class={/* @once */ styles.badgeUnique}
-              backdropAttr={props.item.collectibleAttributes.backdrop}
+              backdropAttr={props.item.collectibleAttributes?.backdrop}
             >
               {isPinned() || props.view === 'resale' ? `#${gift.num}` : i18n('StarGiftLimitedBadgeNum', [formatNumber(gift.availability_total, 1)])}
             </StarGiftBadge>

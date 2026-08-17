@@ -112,18 +112,18 @@ const delays: {
   }
 } = {
   client: {
-    disconnectDelayMin: 7,
-    disconnectDelayMax: 20,
-    pingInterval: 2000,
-    pingMaxTime: 5,
-    connectionTimeout: 5000
+    disconnectDelayMin: 30,
+    disconnectDelayMax: 60,
+    pingInterval: 5000,
+    pingMaxTime: 15,
+    connectionTimeout: 15000
   },
   file: {
-    disconnectDelayMin: 10,
-    disconnectDelayMax: 24,
-    pingInterval: 3000,
-    pingMaxTime: 7,
-    connectionTimeout: 7500
+    disconnectDelayMin: 45,
+    disconnectDelayMax: 75,
+    pingInterval: 5000,
+    pingMaxTime: 15,
+    connectionTimeout: 20000
   }
 };
 // * don't clean these messages in `cleanupSent`,

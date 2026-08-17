@@ -62,6 +62,7 @@ export function StarGiftBackdrop(props: {
   const [patternCanvas, setPatternCanvas] = createSignal<HTMLCanvasElement>();
 
   function render() {
+    if (!props.backdrop || !props.patternEmoji) return;
     const middleware = middlewareHelper.get();
     const currentEmoji = props.patternEmoji;
     wrapEmojiPattern({
@@ -78,7 +79,7 @@ export function StarGiftBackdrop(props: {
       if(!canvas) return;
       canvas.classList.add(styles.canvas, props.canvasClass);
       setPatternCanvas(canvas);
-    });
+    }).catch(() => {});
   }
 
   createEffect(on(() => [
@@ -94,8 +95,8 @@ export function StarGiftBackdrop(props: {
     <div
       class={classNames(styles.wrap, props.class)}
       style={{
-        '--stargift-backdrop-edge-color': rgbIntToHex(props.backdrop.edge_color),
-        '--stargift-backdrop-center-color': rgbIntToHex(props.backdrop.center_color)
+        '--stargift-backdrop-edge-color': props.backdrop ? rgbIntToHex(props.backdrop.edge_color) : undefined,
+        '--stargift-backdrop-center-color': props.backdrop ? rgbIntToHex(props.backdrop.center_color) : undefined
       }}
     >
       <Transition>

@@ -114,8 +114,9 @@ export default async function wrapSticker({doc, div, middleware, loadStickerMidd
     emoji = doc.stickerEmojiRaw;
   }
 
-  const stickerType = doc.sticker ?? StickerType.Static;
-  if(stickerType === StickerType.Static || (stickerType === StickerType.WebM && !IS_WEBM_SUPPORTED)) {
+  const isVideoOrGif = doc.type === 'gif' || doc.type === 'video' || doc.mime_type === 'video/mp4';
+  const stickerType = doc.sticker ?? (isVideoOrGif ? StickerType.WebM : StickerType.Static);
+  if(stickerType === StickerType.Static || (stickerType === StickerType.WebM && !isVideoOrGif && !IS_WEBM_SUPPORTED)) {
     asStatic = true;
   }
 

@@ -79,6 +79,7 @@ function AttributeTableButton(props: {rarity: StarGiftAttributeRarity}) {
 
   return (
     <TableButtonWithTooltip
+      class="rarity rarity-gold disable-hover"
       tooltipTextElement={i18n('StarGiftAttributeTooltip', [`${props.rarity.permille / 10}%`])}
       tooltipClass="popup-star-gift-info-tooltip"
     >
@@ -131,9 +132,11 @@ function AnimatedAttributeValue(props: {
   const [position, setPosition] = createSignal(0);
 
   const items: AnimatedAttributeValueItem[] = [];
-  while(items.length < props.count - 1) {
-    const left = props.count - 1 - items.length;
-    items.push(...props.items.slice(0, left));
+  if (props.items && props.items.length > 0) {
+    while(items.length < props.count - 1) {
+      const left = props.count - 1 - items.length;
+      items.push(...props.items.slice(0, left));
+    }
   }
   items.push(props.actual);
 
@@ -181,19 +184,17 @@ function AnimatedAttributeValue(props: {
       mode="replacement"
       appear={true}
     >
-      <Switch>
-        <Index each={items}>
-          {(item, index) => (
-            <Match when={index === position()}>
-              <AttributeValue
-                name={item().name}
-                rarity={item().rarity}
-                onClick={props.onClick}
-              />
-            </Match>
-          )}
-        </Index>
-      </Switch>
+      <Index each={items}>
+        {(item, index) => (
+          <Show when={index === position()}>
+            <AttributeValue
+              name={item().name}
+              rarity={item().rarity}
+              onClick={props.onClick}
+            />
+          </Show>
+        )}
+      </Index>
     </SimpleAnimation>
   )
 }
@@ -214,16 +215,20 @@ function UpgradeAnimation(props: {
   const BACKDROPS_DURATION = 700;
 
   const models: StarGiftAttribute.starGiftAttributeModel[] = [];
-  while(models.length < MODELS_COUNT - 1) {
-    const left = MODELS_COUNT - 1 - models.length;
-    models.push(...props.preview.models.slice(0, left));
+  if (props.preview.models && props.preview.models.length > 0) {
+    while(models.length < MODELS_COUNT - 1) {
+      const left = MODELS_COUNT - 1 - models.length;
+      models.push(...props.preview.models.slice(0, left));
+    }
   }
   models.push(props.actualModel);
 
   const backdrops: StarGiftAttribute.starGiftAttributeBackdrop[] = [];
-  while(backdrops.length < BACKDROPS_COUNT - 1) {
-    const left = BACKDROPS_COUNT - 1 - backdrops.length;
-    backdrops.push(...props.preview.backdrops.slice(0, left));
+  if (props.preview.backdrops && props.preview.backdrops.length > 0) {
+    while(backdrops.length < BACKDROPS_COUNT - 1) {
+      const left = BACKDROPS_COUNT - 1 - backdrops.length;
+      backdrops.push(...props.preview.backdrops.slice(0, left));
+    }
   }
   backdrops.push(props.actualBackdrop);
 
@@ -586,7 +591,8 @@ export default class PopupStarGiftInfo extends PopupElement {
         peerId: rootScope.myId,
         resaleParams: {
           giftId: (gift as StarGift.starGiftUnique).gift_id,
-          filter: attribute
+          filter: attribute,
+          title: gift.title
         }
       })
     }
@@ -660,65 +666,71 @@ export default class PopupStarGiftInfo extends PopupElement {
           ]);
         }
 
-        rows.push([
-          'StarGiftModel',
-          this.upgradeAnimation ? (
-            <AnimatedAttributeValue
-              items={this.upgradeAnimation.models}
-              actual={collectibleAttributes.model}
-              duration={2000}
-              count={10}
-              onClick={() => handleAttributeClick(collectibleAttributes.model)}
-              started={upgradeAnimationStarted()}
-            />
-          ) : (
-            <AttributeValue
-              name={collectibleAttributes.model.name}
-              rarity={collectibleAttributes.model.rarity}
-              onClick={() => handleAttributeClick(collectibleAttributes.model)}
-            />
-          )
-        ]);
+        if (collectibleAttributes?.model) {
+          rows.push([
+            'StarGiftModel',
+            this.upgradeAnimation ? (
+              <AnimatedAttributeValue
+                items={this.upgradeAnimation.models}
+                actual={collectibleAttributes.model}
+                duration={2000}
+                count={10}
+                onClick={() => handleAttributeClick(collectibleAttributes.model!)}
+                started={upgradeAnimationStarted()}
+              />
+            ) : (
+              <AttributeValue
+                name={collectibleAttributes.model.name}
+                rarity={collectibleAttributes.model.rarity}
+                onClick={() => handleAttributeClick(collectibleAttributes.model!)}
+              />
+            )
+          ]);
+        }
 
-        rows.push([
-          'StarGiftBackdrop',
-          this.upgradeAnimation ? (
-            <AnimatedAttributeValue
-              items={this.upgradeAnimation.backdrops}
-              actual={collectibleAttributes.backdrop}
-              duration={800}
-              count={4}
-              onClick={() => handleAttributeClick(collectibleAttributes.backdrop)}
-              started={upgradeAnimationStarted()}
-            />
-          ) : (
-            <AttributeValue
-              name={collectibleAttributes.backdrop.name}
-              rarity={collectibleAttributes.backdrop.rarity}
-              onClick={() => handleAttributeClick(collectibleAttributes.backdrop)}
-            />
-          )
-        ]);
+        if (collectibleAttributes?.backdrop) {
+          rows.push([
+            'StarGiftBackdrop',
+            this.upgradeAnimation ? (
+              <AnimatedAttributeValue
+                items={this.upgradeAnimation.backdrops}
+                actual={collectibleAttributes.backdrop}
+                duration={800}
+                count={4}
+                onClick={() => handleAttributeClick(collectibleAttributes.backdrop!)}
+                started={upgradeAnimationStarted()}
+              />
+            ) : (
+              <AttributeValue
+                name={collectibleAttributes.backdrop.name}
+                rarity={collectibleAttributes.backdrop.rarity}
+                onClick={() => handleAttributeClick(collectibleAttributes.backdrop!)}
+              />
+            )
+          ]);
+        }
 
-        rows.push([
-          'StarGiftPattern',
-          this.upgradeAnimation ? (
-            <AnimatedAttributeValue
-              items={this.upgradeAnimation.patterns}
-              actual={collectibleAttributes.pattern}
-              duration={1000}
-              count={5}
-              onClick={() => handleAttributeClick(collectibleAttributes.pattern)}
-              started={upgradeAnimationStarted()}
-            />
-          ) : (
-            <AttributeValue
-              name={collectibleAttributes.pattern.name}
-              rarity={collectibleAttributes.pattern.rarity}
-              onClick={() => handleAttributeClick(collectibleAttributes.pattern)}
-            />
-          )
-        ]);
+        if (collectibleAttributes?.pattern) {
+          rows.push([
+            'StarGiftPattern',
+            this.upgradeAnimation ? (
+              <AnimatedAttributeValue
+                items={this.upgradeAnimation.patterns}
+                actual={collectibleAttributes.pattern}
+                duration={1000}
+                count={5}
+                onClick={() => handleAttributeClick(collectibleAttributes.pattern!)}
+                started={upgradeAnimationStarted()}
+              />
+            ) : (
+              <AttributeValue
+                name={collectibleAttributes.pattern.name}
+                rarity={collectibleAttributes.pattern.rarity}
+                onClick={() => handleAttributeClick(collectibleAttributes.pattern!)}
+              />
+            )
+          ]);
+        }
 
         rows.push([
           'StarGiftAvailability',
@@ -969,15 +981,17 @@ export default class PopupStarGiftInfo extends PopupElement {
         this.managers.appGiftsManager.getStarGiftOptions().catch(() => {})
       }
 
-      wrapSticker({
-        doc: sticker,
-        div: stickerContainer,
-        width: 120,
-        height: 120,
-        play: !this.upgradeAnimation,
-        needFadeIn: !!this.upgradeAnimation,
-        middleware: this.middlewareHelper.get()
-      })
+      if(sticker) {
+        wrapSticker({
+          doc: sticker,
+          div: stickerContainer,
+          width: 120,
+          height: 120,
+          play: !this.upgradeAnimation,
+          needFadeIn: !!this.upgradeAnimation,
+          middleware: this.middlewareHelper.get()
+        });
+      }
     })
 
     let confetti!: ConfettiRef;
@@ -986,7 +1000,7 @@ export default class PopupStarGiftInfo extends PopupElement {
       <div class={`popup-star-gift-info-container ${gift._ === 'starGiftUnique' ? 'is-collectible' : ''}`}>
         <ConfettiContainer ref={confetti} />
         <div class="popup-star-gift-info-header">
-          {gift._ === 'starGiftUnique' && (
+          {gift._ === 'starGiftUnique' && collectibleAttributes?.backdrop && collectibleAttributes?.pattern && (
             <StarGiftBackdrop
               class="popup-star-gift-info-backdrop"
               backdrop={collectibleAttributes.backdrop}
@@ -998,7 +1012,7 @@ export default class PopupStarGiftInfo extends PopupElement {
             classList={{hide: !upgradeAnimationComplete()}}
             ref={stickerContainer}
           />
-          {this.upgradeAnimation && !upgradeAnimationComplete() && (
+          {this.upgradeAnimation && !upgradeAnimationComplete() && collectibleAttributes?.model && collectibleAttributes?.backdrop && (
             <UpgradeAnimation
               preview={this.upgradeAnimation}
               actualModel={collectibleAttributes.model}

@@ -85,23 +85,32 @@ export function createProfileGiftsStore(props: {
 
     const id = ++nextReqId
     const collectionId = store.chosenCollection === ALL_COLLECTIONS_ID ? undefined : store.chosenCollection
-    const [res, canManageGifts] = await Promise.all([
-      rootScope.managers.appGiftsManager.getProfileGifts({
-        peerId: props.peerId,
-        offset: currentOffset,
-        sort: store.sort,
-        unlimited: store.unlimited,
-        limited: store.limited,
-        upgradable: store.upgradable,
-        unique: store.unique,
-        displayed: store.displayed,
-        hidden: store.hidden,
-        withCollections: store.collections === undefined,
-        collectionId,
-        limit: 99 // divisible by 3 to avoid grid jumping
-      }),
-      fetchedCanManageGifts ? Promise.resolve(store.canManageGifts) : fetchCanManageGifts()
-    ]);
+    let res, canManageGifts;
+    try {
+      [res, canManageGifts] = await Promise.all([
+        rootScope.managers.appGiftsManager.getProfileGifts({
+          peerId: props.peerId,
+          offset: currentOffset,
+          sort: store.sort,
+          unlimited: store.unlimited,
+          limited: store.limited,
+          upgradable: store.upgradable,
+          unique: store.unique,
+          displayed: store.displayed,
+          hidden: store.hidden,
+          withCollections: store.collections === undefined,
+          collectionId,
+          limit: 99 // divisible by 3 to avoid grid jumping
+        }),
+        fetchedCanManageGifts ? Promise.resolve(store.canManageGifts) : fetchCanManageGifts()
+      ]);
+    } catch(err) {
+      console.error('[StarGiftsProfileStore] loadNext failed', err);
+      if(id === nextReqId) {
+        setStore('loading', false);
+      }
+      return;
+    }
 
     if(id !== nextReqId) return;
     currentOffset = res.next;

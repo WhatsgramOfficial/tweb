@@ -41,15 +41,15 @@ export function StarGiftBubble(props: {
           <div class={/* @once */ styles.uniqueGiftProps}>
             <I18nTsx class={/* @once */ styles.uniqueGiftPropName} key="StarGiftModel" />
             <div class={/* @once */ styles.uniqueGiftPropValue}>
-              {props.gift.collectibleAttributes.model.name}
+              {props.gift.collectibleAttributes?.model?.name}
             </div>
             <I18nTsx class={/* @once */ styles.uniqueGiftPropName} key="StarGiftBackdrop" />
             <div class={/* @once */ styles.uniqueGiftPropValue}>
-              {props.gift.collectibleAttributes.backdrop.name}
+              {props.gift.collectibleAttributes?.backdrop?.name}
             </div>
             <I18nTsx class={/* @once */ styles.uniqueGiftPropName} key="StarGiftPattern" />
             <div class={/* @once */ styles.uniqueGiftPropValue}>
-              {props.gift.collectibleAttributes.pattern.name}
+              {props.gift.collectibleAttributes?.pattern?.name}
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@ export function StarGiftBubble(props: {
           />
         </StarGiftBadge>
       )}
-      {props.gift.collectibleAttributes && (
+      {props.gift.collectibleAttributes?.backdrop && props.gift.collectibleAttributes?.pattern && (
         <StarGiftBackdrop
           class={/* @once */ styles.backdrop}
           backdrop={props.gift.collectibleAttributes.backdrop}
@@ -181,15 +181,15 @@ export function UniqueStarGiftWebPageBox(props: {
       <StarGiftBackdrop
         class={/* @once */ styles.webPageBackdrop}
         canvasClass={/* @once */ styles.webPageBackdropCanvas}
-        backdrop={props.gift.collectibleAttributes.backdrop}
-        patternEmoji={props.gift.collectibleAttributes.pattern.document as MyDocument}
+        backdrop={props.gift.collectibleAttributes?.backdrop}
+        patternEmoji={props.gift.collectibleAttributes?.pattern?.document as MyDocument}
       />
       <StickerTsx
         class={/* @once */ styles.webPageSticker}
         width={120}
         height={120}
         extraOptions={props.wrapStickerOptions}
-        sticker={props.gift.collectibleAttributes.model.document as MyDocument}
+        sticker={props.gift.collectibleAttributes?.model?.document as MyDocument}
       />
     </div>
   )

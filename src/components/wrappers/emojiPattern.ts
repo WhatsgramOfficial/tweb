@@ -74,7 +74,7 @@ export default async function wrapEmojiPattern({
       return new Promise<HTMLImageElement | HTMLCanvasElement | HTMLVideoElement>((resolve) => {
         (result as any).addEventListener('firstFrame', () => {
           resolve(image);
-          setTimeout(() => (result as any).destroy(), 10);
+          setTimeout(() => (result as any).destroy?.(), 10);
         });
       });
     } else if (image instanceof HTMLVideoElement) {

@@ -171,7 +171,7 @@ export default class AppGiftsManager extends AppManager {
       let attrPatern: StarGiftAttribute.starGiftAttributePattern;
       let attrOrig: StarGiftAttribute.starGiftAttributeOriginalDetails;
 
-      for(const attr of gift.attributes) {
+      for(const attr of (gift.attributes || [])) {
         switch(attr._) {
           case 'starGiftAttributeModel':
             attr.document = this.appDocsManager.saveDoc(attr.document);
@@ -203,16 +203,20 @@ export default class AppGiftsManager extends AppManager {
         }
       }
 
+      const fallbackSticker = (gift as StarGift.starGiftUnique).gift_id && this.cachedStarGiftOptions ? 
+        this.cachedStarGiftOptions.find(it => it.raw.id === (gift as StarGift.starGiftUnique).gift_id)?.sticker 
+        : undefined;
+
       return {
         type: 'stargift',
         raw: gift,
-        sticker: this.appDocsManager.saveDoc(attrModel.document),
-        collectibleAttributes: {
+        sticker: attrModel ? this.appDocsManager.saveDoc(attrModel.document) : fallbackSticker,
+        collectibleAttributes: (attrModel || attrBackdrop || attrPatern || attrOrig) ? {
           model: attrModel,
           backdrop: attrBackdrop,
           pattern: attrPatern,
           original: attrOrig
-        },
+        } : undefined,
         resellPriceStars,
         resellPriceTon,
         resellOnlyTon: gift.pFlags.resale_ton_only,
@@ -240,7 +244,7 @@ export default class AppGiftsManager extends AppManager {
       from_id: isIncomingGift ? message.peer_id : {_: 'peerUser', user_id: this.rootScope.myId},
       date: message.date,
       gift,
-      message: action._ === 'messageActionStarGift' ? action.message : baseWrap.collectibleAttributes.original?.message,
+      message: action._ === 'messageActionStarGift' ? action.message : baseWrap.collectibleAttributes?.original?.message,
       msg_id: action._ === 'messageActionStarGift' && action.pFlags.prepaid_upgrade ? action.gift_msg_id : message.id,
       convert_stars: gift._ === 'starGift' ? gift.convert_stars : undefined,
       upgrade_stars: gift._ === 'starGift' ? gift.upgrade_stars : undefined,
@@ -308,7 +312,13 @@ export default class AppGiftsManager extends AppManager {
       this.apiManager.invokeApiSingle('payments.getStarGiftCollections', {
         peer: inputPeer,
         hash: 0
-      }) : null
+      }).catch((err: any): any => {
+        console.warn('Failed to fetch collections', err);
+        return null;
+      }) : null;
+
+    const optionsPromise = this.getStarGiftOptions().catch((): null => null);
+
     const res = await this.apiManager.invokeApiSingleProcess({
       method: 'payments.getSavedStarGifts',
       params: {
@@ -327,6 +337,8 @@ export default class AppGiftsManager extends AppManager {
     });
 
     this.appPeersManager.saveApiPeers(res);
+
+    await optionsPromise; // Ensure fallback stickers from generic gifts are available
 
     const wrapped: MyStarGift[] = [];
     for(const it of res.gifts) {
@@ -549,8 +561,8 @@ export default class AppGiftsManager extends AppManager {
       gift_id: params.giftId,
       sort_by_num: params.sort === 'num',
       sort_by_price: params.sort === 'price',
-      attributes: params.filters,
-      attributes_hash: params.attributesHash,
+      attributes: params.filters?.length ? params.filters : undefined,
+      attributes_hash: params.attributesHash || undefined,
       offset: params.offset,
       limit: 51 // divisible by 3 for even grid
     })

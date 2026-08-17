@@ -2882,12 +2882,12 @@ export default class AppSearchSuper {
       const div = document.createElement('div');
       await wrapSticker({
         div,
-        static: true,
+        play: false,
         doc: gift.sticker,
         middleware: this.middleware.get(),
         width: 18,
         height: 18
-      }).then(({render}) => render);
+      }).then(({render}) => render).catch(() => {});
       return div
     })).then((gifts) => {
       let wrap = menuTabName.querySelector('.search-super-pinned-gifts')
@@ -2902,7 +2902,7 @@ export default class AppSearchSuper {
         menuTabName.append(wrap);
       }
       wrap.replaceChildren(...gifts);
-    })
+    }).catch(() => {});
   }
 
   public async canViewSavedDialogs() {

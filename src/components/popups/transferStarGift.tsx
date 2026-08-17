@@ -15,7 +15,7 @@ import Row from '@components/row';
 import {getCollectibleName} from '@appManagers/utils/gifts/getCollectibleName';
 import {passwordPopup} from '@components/popups/password';
 import safeWindowOpen from '@helpers/dom/safeWindowOpen';
-import {createMemo, createSignal} from 'solid-js';
+import {createMemo, createSignal, JSX} from 'solid-js';
 import PopupElement, {createPopup} from '@components/popups/indexTsx';
 
 import styles from '@components/popups/transferStarGift.module.scss'
@@ -48,26 +48,26 @@ export function transferStarGiftConfirmationPopup(options: {
     const {gift: {raw: gift, collectibleAttributes}} = options
     if(gift._ !== 'starGiftUnique') return []
 
-    const rows: TableRow[] = [
-      ['StarGiftModel', (
+    const rows: [string, JSX.Element][] = [
+      collectibleAttributes?.model ? ['StarGiftModel', (
         <AttributeValue
           name={collectibleAttributes.model.name}
           rarity={collectibleAttributes.model.rarity}
         />
-      )],
-      ['StarGiftBackdrop', (
+      )] : undefined,
+      collectibleAttributes?.backdrop ? ['StarGiftBackdrop', (
         <AttributeValue
           name={collectibleAttributes.backdrop.name}
           rarity={collectibleAttributes.backdrop.rarity}
         />
-      )],
-      ['StarGiftPattern', (
+      )] : undefined,
+      collectibleAttributes?.pattern ? ['StarGiftPattern', (
         <AttributeValue
           name={collectibleAttributes.pattern.name}
           rarity={collectibleAttributes.pattern.rarity}
         />
-      )]
-    ];
+      )] : undefined,
+    ].filter(Boolean) as [string, JSX.Element][];
 
     if(gift.value_amount) {
       rows.push([

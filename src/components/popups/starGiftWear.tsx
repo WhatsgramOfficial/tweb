@@ -49,7 +49,7 @@ export default class PopupStarGiftWear extends PopupElement {
     return (
       <div class={/* @once */ styles.container}>
         <div class={/* @once */ classNames(styles.header, 'profile-container need-white is-collapsed')}>
-          {gift._ === 'starGiftUnique' && (
+          {gift._ === 'starGiftUnique' && collectibleAttributes?.backdrop && collectibleAttributes?.pattern && (
             <StarGiftBackdrop
               class={/* @once */ styles.backdrop}
               backdrop={collectibleAttributes.backdrop}

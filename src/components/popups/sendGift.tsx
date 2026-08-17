@@ -1068,6 +1068,7 @@ export default class PopupSendGift extends PopupElement {
   readonly resaleParams?: {
     giftId: Long;
     filter?: StarGiftAttribute;
+    title?: string;
   };
 
   constructor(options: {
@@ -1128,15 +1129,29 @@ export default class PopupSendGift extends PopupElement {
 
     const [chosenGift, setChosenGift] = createSignal<GiftOption>();
     if(this.resaleParams) {
-      const selectedGift = giftOptions.find((it) => it.raw.id === this.resaleParams.giftId && it.isResale);
+      const selectedGift = giftOptions.find((it) => it.raw.id === this.resaleParams!.giftId && it.isResale);
       if(!selectedGift && disallowedGifts &&
-        loadedGiftOptions.some((it) => it.raw.id === this.resaleParams.giftId && it.isResale)) {
+        loadedGiftOptions.some((it) => it.raw.id === this.resaleParams!.giftId && it.isResale)) {
         this.hide();
         toastNew({langPackKey: 'GiftRecipientDoesNotAccept'});
         return;
       }
 
-      setChosenGift(selectedGift);
+      setChosenGift(selectedGift || {
+        isResale: true,
+        type: 'stargift',
+        raw: {
+          _: 'starGift',
+          id: this.resaleParams.giftId,
+          title: this.resaleParams.title || 'Star Gift',
+          availability_total: 0,
+          availability_remains: 0,
+          first_sale_date: 0,
+          last_sale_date: 0,
+          stars: 0 as any,
+          sticker: {} as any
+        }
+      } as unknown as MyStarGift);
     }
     this.chosenGift = chosenGift;
     this.setChosenGift = setChosenGift;

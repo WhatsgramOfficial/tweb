@@ -455,7 +455,7 @@ PeerProfile.PinnedGifts = () => {
       div.setAttribute('data-idx', idx.toString());
       div.style.setProperty(
         '--halo-color',
-        rgbIntToHex(gift.collectibleAttributes.backdrop.center_color)
+        rgbIntToHex(gift.collectibleAttributes?.backdrop?.center_color ?? 0)
       );
       await wrapSticker({
         doc: gift.sticker,

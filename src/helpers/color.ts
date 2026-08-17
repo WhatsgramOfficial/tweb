@@ -158,7 +158,12 @@ export function hexToRgb(hex: string) {
 }
 
 export function rgbIntToHex(int: number, alpha?: number) {
-  let str = `#${int.toString(16).padStart(6, '0')}`;
+  if (int === undefined || int === null || isNaN(int)) {
+    return '#000000';
+  }
+  // Convert signed integer to unsigned 32-bit (if negative) and take bottom 24 bits
+  const hex = ((int >>> 0) & 0xFFFFFF).toString(16).padStart(6, '0');
+  let str = `#${hex}`;
   if(alpha !== undefined) {
     str += `${Math.floor(alpha * 255).toString(16).padStart(2, '0')}`;
   }
@@ -254,8 +259,8 @@ export function changeBrightness(color: ColorRgb, amount: number) {
 }
 
 export function getHexColorFromTelegramColor(color: number) {
-  const hex = (color < 0 ? 0xFFFFFF + color : color).toString(16);
-  return '#' + (hex.length >= 6 ? hex : '0'.repeat(6 - hex.length) + hex);
+  const hex = ((color >>> 0) & 0xFFFFFF).toString(16).padStart(6, '0');
+  return '#' + hex;
 }
 
 export function getRgbColorFromTelegramColor(color: number) {
